@@ -38,7 +38,7 @@ export class Week {
       },
     });
 
-    this.#monday = parse(date, "yyyy-MM-dd", new Date());
+    this.#monday = parse(String(date), "yyyy-MM-dd", new Date());
   }
 
   public addWorklog(worklog: Worklog) {
