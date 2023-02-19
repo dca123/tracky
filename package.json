@@ -1,0 +1,26 @@
+{
+  "name": "tracky",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx ./src/index.ts"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@clack/prompts": "^0.4.3",
+    "date-fns": "^2.29.3",
+    "kolorist": "^1.7.0",
+    "zod": "^3.20.6"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.0",
+    "dotenv": "^16.0.3",
+    "prettier": "^2.8.4",
+    "tsx": "^3.12.3",
+    "typescript": "^4.9.5"
+  }
+}
