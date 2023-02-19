@@ -11,7 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@clack/prompts": "^0.4.3",
+    "@clack/prompts": "link:/Users/devinda/Projects/clack/packages/prompts",
+    "@clack/core": "link:/Users/devinda/Projects/clack/packages/core",
     "date-fns": "^2.29.3",
     "kolorist": "^1.7.0",
     "zod": "^3.20.6"

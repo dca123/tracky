@@ -1,7 +1,8 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@clack/prompts': ^0.4.3
+  '@clack/core': link:/Users/devinda/Projects/clack/packages/core
+  '@clack/prompts': link:/Users/devinda/Projects/clack/packages/prompts
   '@types/node': ^18.14.0
   date-fns: ^2.29.3
   dotenv: ^16.0.3
@@ -12,7 +13,8 @@ specifiers:
   zod: ^3.20.6
 
 dependencies:
-  '@clack/prompts': 0.4.3
+  '@clack/core': link:../../clack/packages/core
+  '@clack/prompts': link:../../clack/packages/prompts
   date-fns: 2.29.3
   kolorist: 1.7.0
   zod: 3.20.6
@@ -25,23 +27,6 @@ devDependencies:
   typescript: 4.9.5
 
 packages:
-
-  /@clack/core/0.1.7:
-    resolution: {integrity: sha512-hyrb8/QlcC2vJO5ZL19/Fl3YHwfPK2o2TuW1zczzFO7lBUQWePGHhJu2wc6AJOjtpbyppylCLWnFFY3sGfLJSg==}
-    dependencies:
-      picocolors: 1.0.0
-      sisteransi: 1.0.5
-    dev: false
-
-  /@clack/prompts/0.4.3:
-    resolution: {integrity: sha512-R3Ws19DbdqKarkfbvqde0v9Cfi7o/mferY4CF4ca4VOrrUXUKP0NOofKEMDzuehEdlImiaC5qs9UKnfU3p2IxQ==}
-    dependencies:
-      '@clack/core': 0.1.7
-      picocolors: 1.0.0
-      sisteransi: 1.0.5
-    dev: false
-    bundledDependencies:
-      - is-unicode-supported
 
   /@esbuild-kit/cjs-loader/2.4.2:
     resolution: {integrity: sha512-BDXFbYOJzT/NBEtp71cvsrGPwGAMGRB/349rwKuoxNSiKjPraNNnlK6MIIabViCjqZugu6j+xeMDlEkWdHHJSg==}
@@ -326,19 +311,11 @@ packages:
     resolution: {integrity: sha512-ymToLHqL02udwVdbkowNpzjFd6UzozMtshPQKVi5k1EjKRqKqBrOnE9QbLEb0/pV76SAiIT13hdL8R6suc+f3g==}
     dev: false
 
-  /picocolors/1.0.0:
-    resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
-    dev: false
-
   /prettier/2.8.4:
     resolution: {integrity: sha512-vIS4Rlc2FNh0BySk3Wkd6xmwxB0FpOndW5fisM5H8hsZSxU2VWVB5CWIkIjWvrHjIhxk2g3bfMKM87zNTrZddw==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
-
-  /sisteransi/1.0.5:
-    resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
-    dev: false
 
   /source-map-support/0.5.21:
     resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}

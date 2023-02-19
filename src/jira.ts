@@ -2,6 +2,8 @@ import { z } from "zod";
 import * as dotenv from "dotenv";
 dotenv.config();
 
+const IssueCache = new Map();
+
 const IssueSchema = z
   .object({
     key: z.string(),
@@ -23,11 +25,16 @@ const IssuesSchema = z.object({
 });
 
 export const getIssues = async () => {
+  if (IssueCache.get("issues")) {
+    return IssueCache.get("issues");
+  }
   const response = await jiraRequest(
     'search?jql=project="KPMG - Funds Automation - Delivery" AND assignee=6271b8502db3080070245a6f AND key = "KPFAD-1003"'
   );
   const data = await response.json();
-  return IssuesSchema.parseAsync(data);
+  const result = await IssuesSchema.parseAsync(data);
+  IssueCache.set("issues", result);
+  return result;
 };
 
 const jiraRequest = async (

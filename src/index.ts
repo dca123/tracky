@@ -15,87 +15,57 @@ import {
 } from "date-fns";
 import * as dotenv from "dotenv";
 import { createWorklog } from "./tempo.js";
+import { Week } from "./week.js";
+import { InternalTechnicalWorklog, Worklog } from "./worklog.js";
+import { getDescription, getTimeSpentSeconds } from "./steps.js";
 dotenv.config();
 
 intro("Welcome to Tracky !");
-let timeToAllocate = 40;
 
 const defaultStartOfWeek = startOfWeek(new Date(), {
   weekStartsOn: 1,
 });
 
-class Week {
-  #monday?: Date;
-  #tuesday?: Date;
-  #wednesday?: Date;
-  #thursday?: Date;
-  #friday?: Date;
-
-  constructor() {}
-
-  public async init() {
-    const date = await text({
-      message: "Start of Week (YYYY-MM-DD)",
-      placeholder: lightFormat(defaultStartOfWeek, "yyyy-MM-dd"),
-      initialValue: lightFormat(defaultStartOfWeek, "yyyy-MM-dd"),
-      validate: (value) => {
-        const date = parse(value, "yyyy-MM-dd", new Date());
-        if (!isMonday(date)) {
-          return "Week must start on a Monday";
-        }
-      },
-    });
-
-    this.#monday = parse(String(date), "yyyy-MM-dd", new Date());
-    this.#tuesday = nextTuesday(this.#monday);
-    this.#wednesday = nextWednesday(this.#monday);
-    this.#thursday = nextThursday(this.#monday);
-    this.#friday = nextFriday(this.#monday);
-  }
-
-  get monday() {
-    if (this.#monday === undefined) {
-      throw new Error("Week not initialised");
-    }
-    return lightFormat(this.#monday, "yyyy-MM-dd");
-  }
-
-  get tuesday() {
-    if (this.#tuesday === undefined) {
-      throw new Error("Week not initialised");
-    }
-    return lightFormat(this.#tuesday, "yyyy-MM-dd");
-  }
-
-  get wednesday() {
-    if (this.#wednesday === undefined) {
-      throw new Error("Week not initialised");
-    }
-    return lightFormat(this.#wednesday, "yyyy-MM-dd");
-  }
-
-  get thursday() {
-    if (this.#thursday === undefined) {
-      throw new Error("Week not initialised");
-    }
-    return lightFormat(this.#thursday, "yyyy-MM-dd");
-  }
-
-  get friday() {
-    if (this.#friday === undefined) {
-      throw new Error("Week not initialised");
-    }
-    return lightFormat(this.#friday, "yyyy-MM-dd");
-  }
-}
-
 const week = new Week();
 await week.init();
 
-while (timeToAllocate > 0) {
-  console.log("Time to allocate: " + green(timeToAllocate));
+while (week.remainingWorkTime > 0) {
+  console.log("Time to allocate: " + green(week.remainingWorkTime));
 
+  const startDate = await week.getDay();
+
+  const project = await select({
+    message: "Select a project",
+    initialValue: "KPMG",
+    options: [
+      { value: "KPMG", label: "KPMG", hint: "KPMG" },
+      { value: "INT", label: "INTERNAL", hint: "INTERNAL" },
+    ],
+  });
+
+  if (typeof project === "symbol") {
+    outro("wtf is happening");
+    break;
+  }
+
+  if (project === "INT") {
+    const description = await getDescription();
+    const timeSpentSeconds = await getTimeSpentSeconds();
+
+    const worklog = new InternalTechnicalWorklog({
+      description,
+      startDate,
+      timeSpentSeconds,
+    });
+
+    week.addWorklog(worklog);
+    continue;
+  }
+
+  const s = spinner();
+  s.start("Fetching issues");
   const { issues } = await getIssues();
+  s.stop();
 
   const issue = await select({
     message: "Select an issue",
@@ -106,37 +76,22 @@ while (timeToAllocate > 0) {
     })),
   });
 
-  const day = await select({
-    message: "Select a day",
-    options: [
-      { value: week.monday, label: "Monday", hint: `${week.monday}` },
-      { value: week.tuesday, label: "Tuesday", hint: `${week.tuesday}` },
-      { value: week.wednesday, label: "Wednesday", hint: `${week.wednesday}` },
-      { value: week.thursday, label: "Thursday", hint: `${week.thursday}` },
-      { value: week.friday, label: "Friday", hint: `${week.friday}` },
-    ],
-  });
+  const description = await getDescription();
+  const timeSpentSeconds = await getTimeSpentSeconds();
 
-  const hours = await text({
-    message: "How many hours?",
-  });
-
-  const description = await text({
-    message: "What did you do?",
-  });
-
-  const s = spinner();
-
-  s.start("Creating worklog");
-  await createWorklog({
-    description: String(description),
+  const worklog = new Worklog({
+    description,
     issueId: Number(issue),
-    startDate: String(day),
-    timeSpentSeconds: Number(hours) * 60 * 60,
+    startDate,
+    timeSpentSeconds: timeSpentSeconds,
   });
-  s.stop();
 
-  timeToAllocate -= Number(hours);
+  week.addWorklog(worklog);
 }
+
+const s = spinner();
+s.start("Creating worklogs");
+await week.pushWorklogs();
+s.stop();
 
 outro("Goodbye, see you next week !");

@@ -6,12 +6,14 @@ export const createWorklog = async ({
   startTime = "08:00:00",
   timeSpentSeconds,
   description,
+  account = "KPMG-FUNDS",
 }: {
   issueId: number;
   startDate: string;
   startTime?: string;
   timeSpentSeconds: number;
   description: string;
+  account?: "KPMG-FUNDS" | "INTERNAL";
 }) => {
   const log = await tempoRequest("worklogs", "POST", {
     authorAccountId: myself.accountId,
@@ -23,14 +25,16 @@ export const createWorklog = async ({
     attributes: [
       {
         key: "_Account_",
-        value: "KPMG-FUNDS",
+        value: account,
       },
     ],
   });
-  console.log(await log.json());
+  if (process.env.DEBUG) {
+    console.debug(await log.json());
+  }
 };
 
-const tempoRequest = async (
+export const tempoRequest = async (
   api: "worklogs",
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body?: any
@@ -38,13 +42,28 @@ const tempoRequest = async (
   if (!process.env.TEMPO) {
     throw new Error("TEMP environment variable not set");
   }
-  return fetch(`https://api.tempo.io/4/${api}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.TEMPO}`,
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    method,
-    body: JSON.stringify(body),
-  });
+  if (process.env.PROD) {
+    return fetch(`https://api.tempo.io/4/${api}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.TEMPO}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      method,
+      body: JSON.stringify(body),
+    });
+  }
+
+  return new Promise<{ json: () => Promise<Record<string, any>> }>(
+    (resolve) => {
+      resolve({
+        json: () => {
+          return {
+            id: 1,
+            ...body,
+          };
+        },
+      });
+    }
+  );
 };
